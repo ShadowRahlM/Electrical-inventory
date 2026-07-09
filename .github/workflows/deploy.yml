@@ -1,4 +1,4 @@
-name: Deploy
+name: CI/CD
 
 on:
   push:
@@ -11,7 +11,53 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements/*.txt"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r backend/requirements/dev.txt
+
+      - name: Black check
+        run: black --check --diff --line-length=120 backend/
+
+      - name: isort check
+        run: isort --check-only --diff --profile=black --line-length=120 backend/
+
+      - name: Flake8
+        run: flake8 backend/ --max-line-length=120 --extend-ignore=E203,W503
+
+      - name: Bandit security scan
+        run: bandit -r backend/ -x backend/tests
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - name: Install frontend deps
+        run: cd frontend && npm ci
+
+      - name: Frontend lint
+        run: cd frontend && npm run lint
+
+      - name: npm audit
+        run: cd frontend && npm audit --audit-level=high || true
+
   test-backend:
+    needs: lint
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -67,7 +113,7 @@ jobs:
           POSTGRES_PASSWORD: esms_password
           REDIS_URL: redis://localhost:6379/0
         run: |
-          python -m pytest --cov=apps --cov-report=xml --cov-report=term
+          python -m pytest --cov=apps --cov-report=xml --cov-report=term --tb=short
           coverage xml
 
       - name: Upload coverage
@@ -77,6 +123,7 @@ jobs:
           fail_ci_if_error: false
 
   test-frontend:
+    needs: lint
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -98,14 +145,32 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Lint
-        run: npm run lint
-
       - name: Build check
         run: npm run build
 
+  security-scan:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy scan backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "backend/"
+          format: "sarif"
+          output: "trivy-backend.sarif"
+          severity: "HIGH,CRITICAL"
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-backend.sarif"
+          category: "backend"
+
   deploy:
-    needs: [test-backend, test-frontend]
+    needs: [test-backend, test-frontend, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
 
@@ -149,5 +214,7 @@ jobs:
           script: |
             cd /opt/esms
             docker compose pull
+            docker compose up -d --remove-orphans --no-deps --scale backend=2 backend
+            sleep 10
             docker compose up -d --remove-orphans
             docker image prune -f
