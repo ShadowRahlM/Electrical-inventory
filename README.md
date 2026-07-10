@@ -48,6 +48,9 @@ Production-ready ERP system for electrical shops. Manages inventory, sales (POS)
 
 ### Windows
 
+Double-click `scripts\setup.bat` (no restrictions, auto-elevates to Administrator).
+
+Or manually:
 ```powershell
 # Run PowerShell as Administrator, then:
 .\scripts\setup.ps1
