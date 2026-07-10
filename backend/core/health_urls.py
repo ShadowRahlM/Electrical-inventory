@@ -38,3 +38,8 @@ def health_check(request):
         checks["status"] = "unhealthy"
 
     return JsonResponse(checks, status=status)
+
+
+urlpatterns = [
+    path("", health_check, name="health-check"),
+]

@@ -9,11 +9,6 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.memory.InMemoryStorage"},
-    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
-}
-
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
     "debug_toolbar",
     "django_extensions",
@@ -27,8 +22,6 @@ DATABASES = {
         "NAME": ":memory:",
     }
 }
-
-DEFAULT_FILE_STORAGE = "django.core.files.storage.InMemoryStorage"
 
 CACHES = {
     "default": {
