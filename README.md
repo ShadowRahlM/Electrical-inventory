@@ -46,24 +46,29 @@ Production-ready ERP system for electrical shops. Manages inventory, sales (POS)
 - Node.js 20+ (for local frontend dev)
 - Python 3.12+ (for local backend dev)
 
-### Clone & Configure
+### Windows
+
+```powershell
+# Run PowerShell as Administrator, then:
+.\scripts\setup.ps1
+```
+
+The script automatically installs WSL2 if needed, configures Docker Desktop, generates a `.env` file with a random secret key, builds the stack, runs migrations, and creates an admin user.
+
+### Linux / macOS
 
 ```bash
 git clone <repo-url> && cd esms
 cp .env.example .env
 # Edit .env with your settings
+
+# Production build & start
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml exec backend python manage.py migrate --noinput
 ```
 
-### Run with Docker (development)
-
-```bash
-docker compose up -d
-# Backend: http://localhost:8000
-# Frontend: http://localhost:5173
-# MinIO Console: http://localhost:9001
-```
-
-### Run locally
+### Run locally (dev)
 
 ```bash
 # Infrastructure
@@ -78,9 +83,11 @@ python manage.py runserver
 
 # Frontend
 cd frontend
-npm ci
+npm install
 npm run dev
 ```
+
+Access: http://localhost (production) or http://localhost:5173 (dev) — login: `admin` / `admin123`
 
 ## Environment Variables
 
