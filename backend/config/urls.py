@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("ht/", include("health_check.urls")),
+    path("api/v1/settings/", include("apps.system_settings.urls")),
     path("api/v1/health/", include("core.health_urls")),
 ]
 

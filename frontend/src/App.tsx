@@ -35,6 +35,7 @@ import PaymentFormPage from "@/ui/pages/payments/PaymentFormPage";
 import ExpenseListPage from "@/ui/pages/expenses/ExpenseListPage";
 import ExpenseFormPage from "@/ui/pages/expenses/ExpenseFormPage";
 import ReportsPage from "@/ui/pages/reports/ReportsPage";
+import SettingsPage from "@/ui/pages/settings/SettingsPage";
 import AccountListPage from "@/ui/pages/accounting/AccountListPage";
 import JournalEntryListPage from "@/ui/pages/accounting/JournalEntryListPage";
 import JournalEntryFormPage from "@/ui/pages/accounting/JournalEntryFormPage";
@@ -102,6 +103,7 @@ function App() {
                 <Route path="new" element={<ExpenseFormPage />} />
               </Route>
               <Route path="reports" element={<ReportsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="accounting" element={<Outlet />}>
                 <Route index element={<FinancialSummaryPage />} />
                 <Route path="accounts" element={<AccountListPage />} />
