@@ -11,6 +11,9 @@ venv/
 env/
 *.sqlite3
 *.db
+.coverage
+htmlcov/
+.coverage.*
 
 # Node
 node_modules/
