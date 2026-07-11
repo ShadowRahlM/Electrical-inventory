@@ -20,4 +20,4 @@ python-dotenv>=1.0,<1.2
 Pillow>=10.3
 django-celery-beat>=2.6,<3.0
 django-money>=3.4,<3.7
-phonenumbers>=8.13,<9.1
+phonenumbers>=9.0.34,<9.1
