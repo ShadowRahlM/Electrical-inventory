@@ -9,5 +9,5 @@ flake8>=7.0,<7.2
 black>=24.4,<25.2
 isort>=5.13,<5.14
 bandit>=1.7,<1.8
-django-extensions>=3.2,<4.2
+django-extensions>=4.1,<4.2
 ipython>=8.22,<8.31
